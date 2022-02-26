@@ -1,0 +1,68 @@
+﻿
+Hashtable = function () {
+    this.items = new Array();
+    this.itemsCount = 0;
+    this.containsKey = function (key) {
+        return typeof (this.items[key]) != "undefined";
+    }
+    this.put = function (key, value) {
+        if (!this.containsKey(key)) {
+            this.items[key] = value;
+            this.itemsCount += 1;
+        }else{
+        	this.items[key] = value;
+        }
+    }
+    this.get = function (key) {
+        if (this.containsKey(key)) {
+            return this.items[key];
+        } else {
+            return null;
+        }
+    }
+    this.remove = function (key) {
+        if (this.containsKey(key)) {
+            delete this.items[key];
+            this.itemsCount -= 1;
+        }
+    }
+    this.containsValue = function (value) {
+        for (var key in this.items) {
+            if (this.items[key] == value) {
+                return true;
+            }
+        }
+        return false;
+    }
+    this.contains = function (val) {
+        return this.containsKey(val) || this.containsValue(val);
+    }
+    this.clear = function () {
+        this.items = new Array();
+        this.itemsCount = 0;
+    }
+    this.size = function () {
+        return this.itemsCount;
+    }
+    this.isEmpty = function () {
+        return this.size() == 0;
+    }
+    this.keys = function () {
+        var keys = new Array();
+        for (var key in this.items) {
+            if ("remove" != key && "indexOf" != key) {
+                keys.push(key);
+            }
+        }
+        return keys;
+    }
+    this.values = function () {
+        var values = new Array();
+        for (var key in this.items) {
+            if ("remove" != key && "indexOf" != key) {
+                values.push(this.items[key]);
+            }
+        }
+        return values;
+    }
+}

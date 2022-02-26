@@ -1,0 +1,118 @@
+.feedbackcon,.feedbackreply{
+	width:400px;
+	height:200px;
+}
+.fileimg{
+	width:140px;
+	height:140px;
+}
+/* 清除浮动 */
+.ks-clear:after, .clear:after {
+  content: '\20';
+  display: block;
+  height: 0;
+  clear: both;
+  overflow:hidden
+}
+.ks-clear, .clear {
+  *zoom: 1;
+}
+.filebox, .replybox{
+	float:left;
+	position:relative;
+}
+.filebox i, .replybox i {
+	position:absolute;
+	right:10px;
+	top:10px;
+	font-size:18px;
+	display:none;
+	cursor: pointer;
+}
+.file,.replyfile{
+	height:0;
+	width:0;
+}
+.filebox .addicon,.replybox .addicon{
+	position:absolute;
+	width:100%;
+	height:100%;
+	top:0;
+	left:0;
+}
+.filebox .addicon i ,.replybox .addicon i{
+	display:block;
+	font-size:100px;
+	font-weight:900;
+	right:0;
+	top:0;
+	bottom:0;
+	left:0;
+	margin:auto;
+	line-height:140px;
+}
+.authortime, .replytime{
+	float:right;
+	margin-right:10px;
+}
+.replyshowbox{
+	margin-left:30px;
+}
+.viewimgbox img{
+	width:140px !important;
+	height:140px !important;
+	margin:0 2px;
+	border: 1px solid #666;
+}
+.viewimg img{
+	margin:0 2px;
+	border: 1px solid #666;
+}
+.replyname{
+	padding-right:10px;
+}
+.images img{
+	margin:2px;
+	border: 1px solid #666;
+}
+#bigimgbox{
+	position: fixed;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    background: rgba(0,0,0,0.5);
+    display:none;
+    z-index:10000;
+}
+#bigimg {
+	position: absolute;
+	width:50%;
+	left:0;
+	top:0;
+	right:0;
+	bottom:0;
+	margin:auto;
+	
+}
+#bigimgbox .imgleft,#bigimgbox .imgright{
+	position: absolute;
+	width:80px;
+	height:80px;
+	border:2px solid #fff;
+	border-radius: 50%;
+	top:50%;
+	margin-top:-40px;
+	font-size:56px;
+	color:#fff;
+	text-align: center;
+}
+.imgleft i,.imgright i{
+	line-height:80px;
+}
+.imgleft{
+	left:20px;
+}
+.imgright{
+	right:20px;
+}

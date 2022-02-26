@@ -1,0 +1,21 @@
+/**
+ * 
+ */
+
+document.onkeydown = function()
+{
+    /*
+    (ctrlKey == true && keyCode == 82)   Ctrl+R   ---刷新
+    (keyCode == 116)                     F5       ---刷新
+    (ctrlKey == true && keyCode == 116)  Ctrl+F5  ---强制刷新
+    */
+    var k = event.keyCode;
+    if((event.ctrlKey == true && k == 82) || (k == 116) || (event.ctrlKey == true && k == 116))
+    {
+        event.keyCode = 0;
+        event.returnValue = false;
+        event.cancelBubble = true;
+        window.location.reload();
+        return false;
+    }
+}

@@ -1,0 +1,670 @@
+
+// 全局配置信息
+//var g_img_pre = "http://yunweizhi.com:7750"; //图地址拼接前缀
+//var g_img_pre = 'http://123.160.223.38:9800'; //郑州图地址拼接前缀
+//var g_img_pre = 'http://121.201.107.22:9800'; //公司图地址拼接前缀
+var g_img_pre = 'http://' + window.location.hostname + ':9800'; //图地址拼接前缀
+var currUrl = '';
+
+//格式化显示图标
+function formatterIcon(val, row, idx){
+	return  '<img src="'+g_img_pre+val+'" height="24px">';
+}
+
+//格式化显示图标
+function formatterIcon16(val, row, idx){
+	var str = ''
+	if(val){
+		str = '<img src="'+g_img_pre+val+'" height="16px">'
+	}
+	return  str;
+}
+
+//格式化显示图标 iconid
+function formatterIconid(val, row, idx){
+    var url = row.iconid ? 'images/mark/icon-'+ row.iconid +'.png' : 'images/mark_b.png';
+    return  '<img src="'+ url +'" height="20px">';
+}
+
+//图标路径拼接
+function formatterIconPath(iconpath){
+	if( iconpath !=null && iconpath != "" ){
+		return g_img_pre + iconpath;
+	}
+	return "";
+}
+
+$.fn.serializeObject = function() {
+	var o = {};
+	var a = this.serializeArray();
+	$.each(a, function() {
+		if (o[this.name]) {
+			if (!o[this.name].push) {
+				o[this.name] = [ o[this.name] ];
+			}
+			o[this.name].push(this.value || '');
+		} else {
+			o[this.name] = this.value || '';
+		}
+	});
+	return o;
+};
+
+//重置 bootstrapValidator
+function resetValidator(id){
+	var options = $(id).data('bootstrapValidator').getOptions();
+	$(id).data('bootstrapValidator').destroy();
+	$(id).bootstrapValidator(options);
+}
+
+//格式化时间字符串
+//对Date的扩展，将 Date 转化为指定格式的String
+//月(M)、日(d)、小时(h)、分(m)、秒(s)、季度(q) 可以用 1-2 个占位符， 
+//年(y)可以用 1-4 个占位符，毫秒(S)只能用 1 个占位符(是 1-3 位的数字) 
+//例子： 
+//(new Date()).Format("yyyy-MM-dd hh:mm:ss.S") ==> 2006-07-02 08:09:04.423 
+//(new Date()).Format("yyyy-M-d h:m:s.S")      ==> 2006-7-2 8:9:4.18 
+Date.prototype.Format = function (fmt) { //author: meizz 
+ var o = {
+     "M+": this.getMonth() + 1, //月份 
+     "d+": this.getDate(), //日 
+     "h+": this.getHours(), //小时 
+     "m+": this.getMinutes(), //分 
+     "s+": this.getSeconds(), //秒 
+     "q+": Math.floor((this.getMonth() + 3) / 3), //季度 
+     "S": this.getMilliseconds() //毫秒 
+ };
+ if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+ for (var k in o)
+ if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+ return fmt;
+}
+
+function doShowResultTip(result){
+	var title = '';
+	var content = '';
+	if(result == null){
+		title = 'Error';
+		content = 'Unknown Error';
+	}
+	else
+	{
+		if(result.success){
+			title ='Success';
+		}else{
+			title = 'Error';
+		}
+		content = parseInt(result.errCode)>=g_errstring.length ? (result.errString != null ? result.errString : 'Error:'+result.errCode) : g_errstring[parseInt(result.errCode)] ;
+	}
+
+	
+	$.gritter.add({
+		title: title,
+		text: content,
+		sticky: false,
+		//time: 5000,
+		class_name: 'gritter-info' 
+	});
+}
+
+function doShowTip(title, content){
+	$.gritter.add({
+		title: title,
+		text: content,
+		sticky: false,
+		//time: '',
+		class_name: 'gritter-info' 
+	});
+}
+
+var g_gritter_waiting_id = 0;
+function doShowWaiting(content){
+	if( g_gritter_waiting_id != 0) {
+		$.gritter.remove(g_gritter_waiting_id, {});
+		g_gritter_waiting_id = 0;
+	}
+	g_gritter_waiting_id = $.gritter.add({
+		sticky: true,
+		text: '<i class="icon-spinner icon-spin orange bigger-125"></i>   ' + (content == null ?  ctxt.wait : content),
+		class_name: 'gritter-regular gritter-center'
+	});
+}
+
+function doHideWaiting(){
+	if( g_gritter_waiting_id != 0) {
+		$.gritter.remove(g_gritter_waiting_id, {});
+		g_gritter_waiting_id = 0;
+	}
+}
+
+
+
+//调用提示窗口HTML显示提示信息
+function showAlert(title, content){
+	// $('#dialog-title').text(title);
+	// $('#dialog-info').html(content);
+	// $('#dialog-tip').modal('show');
+
+	bootbox.dialog({
+		title: title,
+		message: "<span class='bigger-110'>"+content+"</span>",
+		buttons:
+		{
+			"button" :
+			{
+				"label" : "OK",
+				"className" : "btn-sm btn-primary"
+			}
+		}
+	});
+}
+
+
+//格式化显示车辆类型
+function formatterTermtype(val, row, idx){
+	switch(val){
+	case 1: return ctxt.termtype[0];
+	case 2: return ctxt.termtype[1];
+	case 3: return ctxt.termtype[2];
+	case 4: return ctxt.termtype[3];
+	default: return ctxt.termtype[4] + val;
+	}
+	return val;
+}
+
+//格式化定位状态
+function formatterLocateType(loc){
+	switch(loc){
+	case 0: return ctxt.locate[0];
+	case 1: return ctxt.locate[1];
+	case 2: return ctxt.locate[2];
+	default: return ctxt.locate[3]+loc;
+	}
+}
+//格式化 ACC 状态
+function formatterACC(p){
+	return ( g_status[0][parseInt(p.status.charAt(0))] );
+}
+//格式化状态内容,传入 LastPos对象
+function formatterAllStatus(p){
+	var str = new Array();
+	
+	//在线状态
+//	if(p.online)
+//		str.push(ctxt.gsonline);
+//	else
+//		str.push(ctxt.gsoffline);
+//	str.push(formatterLocateType(p.locate));
+	
+	//下面是车辆状态部分
+//	if(p.status.charAt(0) == '2')
+//		str.push(ctxt.gsaccoff);
+//	else if(p.status.charAt(0) == '1')
+//		str.push(ctxt.gsaccon);
+//	
+//	if(p.status.charAt(1) == '2')
+//		str.push(ctxt.gsfuelon);
+//	else if(p.status.charAt(1) == '1')
+//		str.push(ctxt.gsfueloff);
+//	
+//	if(p.status.charAt(2) == '2')
+//		str.push(ctxt.gseletronon);
+//	else if(p.status.charAt(2) == '1')
+//		str.push(ctxt.gseletronoff);
+//	
+//	if(p.status.charAt(3) == '2')
+//		str.push(ctxt.gschargeoff);
+//	else if(p.status.charAt(3) == '1')
+//		str.push(ctxt.gschargeon);
+//	
+//	if(p.status.charAt(4) == '2')
+//		str.push(ctxt.gssleep);
+//	else if(p.status.charAt(4) == '1')
+//		str.push(ctxt.gsactive);
+//	
+////	if(p.status.charAt(5) == '2')
+////		str.push("基站定位关");
+////	else if(p.status.charAt(5) == '1')
+////		str.push("基站定位开");
+//	
+//	if(p.status.charAt(6) == '2')
+//		str.push(ctxt.gsdisarm);
+//	else if(p.status.charAt(6) == '1')
+//		str.push(ctxt.gsdefense);
+	
+	for(var i=0; i<p.status.length; i++){
+		if(i<g_status.length){
+			if( g_status[i][parseInt(p.status.charAt(i))].length > 0 )
+				str.push( g_status[i][parseInt(p.status.charAt(i))] );
+		}
+	}
+	
+//	//停止时间
+//	if(p.stoptime>0){
+//		var l = p.stoptime; 
+//		var day = parseInt(l / (60*60*24) )
+//		var hour = parseInt(l / (60 * 60 ) - day*24);
+//		var min = parseInt((l / (60 )) - day*24*60 - hour * 60);
+//		var s = parseInt(l  - day*24*60*60 - hour * 60 * 60 - min * 60);
+//		var time = "<red>"+ctxt.stop + (day>0 ? day+ ctxt.day : '') + (hour>0 ? hour+ ctxt.hour : '') + (min>0 ? min+ ctxt.min : '') + (s>0 ? s+ ctxt.second : '') + '</red>';
+//		str.push(time);
+//	}
+	
+	//工作时长
+	if(p.accontime>0){
+		var time = ctxt.work + formatterTime(p.accontime);
+		str.push(time);
+	}
+//	//今日工作时长
+//	if(p.accontoday !== undefined && p.accontoday > 0){
+//		var time = ctxt.worktoday + formatterTime(p.accontoday);
+//		str.push(time);
+//	}
+//	//今日工作时长
+//	if(p.mileagetoday !== undefined && p.mileagetoday > 0){
+//		var time = ctxt.mileagetoday + (p.mileagetoday/1000).toFixed(1) + txt.pmileageUnit;
+//		str.push(time);
+//	}	
+	
+	if( p.other != null && p.other.length>0){
+		var o = eval("("+p.other+")");
+		//油量百分比
+		if( o.fper !== undefined && o.fper.length > 0 ){
+			for(var i=0; i<o.fper.length; i++){
+				var m = o.fper[i];
+				str.push( ctxt.fuel+m.i+':'+m.v.toFixed(2)+"%" );
+			}
+		}
+		//温度
+		if( o.temp !== undefined && o.temp.length > 0 ){
+			for(var i=0; i<o.temp.length; i++){
+				var m = o.temp[i];
+				str.push( ctxt.temp+m.i+':'+m.v.toFixed(1)+"˚C" );
+			}
+		}
+		//湿度
+		if( o.hper !== undefined && o.hper.length > 0 ){
+			for(var i=0; i<o.hper.length; i++){
+				var m = o.hper[i];
+				str.push( ctxt.humi+m.i+':'+m.v.toFixed(2)+"%" );
+			}
+		}
+//		//开锁次数
+//		if( o.opentimes !== undefined && o.opentimes >= 0 ){
+//			str.push( ctxt.opentimes + o.opentimes );
+//		}
+		
+		//fly808
+		if( o.fly808 !== undefined ){
+			try{
+				var f = o.fly808;
+				if( f.bt!=undefined && (f.bt&0x01)!=0 )
+					str.push(ctxt.fly808[0]);
+				else
+					str.push(ctxt.fly808[1]);
+				if( f.bt!=undefined && (f.bt&0x02)!=0 )
+					str.push(ctxt.fly808[2]);
+				else
+					str.push(ctxt.fly808[3]);
+				if( f.wt!=undefined )
+					str.push(ctxt.fly808[4]+f.wt);
+				if( f.rt!=undefined )
+					str.push(ctxt.fly808[5]+ formatterTime(f.rt*60) );
+				if( f.mv!=undefined )
+					str.push(ctxt.fly808[6]+ f.mv );
+				
+			 }catch(e){
+                console.log(e.message);
+            }
+		}
+		
+		//QHYC
+		if( o.bms !== undefined ){
+			try{
+				var b = o.bms;
+				if( b.soc != undefined ){
+					str.push(ctxt.bms[0]+b.soc+'%');
+				}
+				if( b.temp != undefined ){
+					str.push(ctxt.bms[1]+b.temp+'˚C');
+				}
+				if( b.mv != undefined ){
+					str.push(ctxt.bms[2]+b.mv+'mV');
+				}
+				if( b.ma != undefined ){
+					str.push(ctxt.bms[3]+b.ma+'mA');
+				}
+			}catch(e){
+				console.log(e.message);
+			}
+		}
+	}
+	
+	return str.join(',');
+}
+
+//格式化can数据
+function formatterCan(o){
+	if( o == null ) return '';
+	var arr = [];
+	if( o.x18FF28F4 != null && o.x18FF28F4 !== undefined && o.x18FF28F4.length == 8 ){
+		var p = o.x18FF28F4;
+		if( (p[0]&0x01) != 0 ){
+			arr.push(ctxt.x18FF28F4_0_01[0] + ctxt.x18FF28F4_0_01[2]);
+		}else{
+			arr.push(ctxt.x18FF28F4_0_01[0] + ctxt.x18FF28F4_0_01[1]);			
+		}
+		if( (p[0]&0x02) != 0 ){
+			arr.push(ctxt.x18FF28F4_0_02[0] + ctxt.x18FF28F4_0_02[2]);
+		}else{
+			arr.push(ctxt.x18FF28F4_0_02[0] + ctxt.x18FF28F4_0_02[1]);			
+		}
+		if( (p[0]&0x04) != 0 ){
+			arr.push(ctxt.x18FF28F4_0_04[0] + ctxt.x18FF28F4_0_04[2]);
+		}else{
+			arr.push(ctxt.x18FF28F4_0_04[0] + ctxt.x18FF28F4_0_04[1]);			
+		}
+		if( (p[0]&0x08) != 0 ){
+			arr.push(ctxt.x18FF28F4_0_08[0] + ctxt.x18FF28F4_0_08[2]);
+		}else{
+			arr.push(ctxt.x18FF28F4_0_08[0] + ctxt.x18FF28F4_0_08[1]);			
+		}
+		arr.push(ctxt.x18FF28F4_1_0 + (p[1]&0xFF) + "%");
+		arr.push(ctxt.x18FF28F4_2_0 + (((p[2]&0xFF)+((p[3]<<8)&0xFF00)-5000)/10.0).toFixed(1) + "A");
+		arr.push(ctxt.x18FF28F4_4_0 + (((p[4]&0xFF)+((p[5]<<8)&0xFF00) )/10.0).toFixed(1) + "V");
+		arr.push(ctxt.x18FF28F4_6_0[0] + ( (p[6]&0xFF)<ctxt.x18FF28F4_6_0.length ? ctxt.x18FF28F4_6_0[(p[6]&0xFF)+1] : (p[6]&0xFF)) );
+		arr.push(ctxt.x18FF28F4_7_0 + (p[7]&0xFF));
+		
+	}
+	if( o.x18F560EF != null && o.x18F560EF !== undefined && o.x18F560EF.length > 0 ){
+		var p = o.x18F560EF;
+		if( (p[0]&0x03) == 0x00 )
+			arr.push(ctxt.x18F560EF_0_03[0] + ctxt.x18F560EF_0_03[1]);
+		if( (p[0]&0x03) == 0x01 )
+			arr.push(ctxt.x18F560EF_0_03[0] + ctxt.x18F560EF_0_03[2]);
+		if( (p[0]&0x03) == 0x02 )
+			arr.push(ctxt.x18F560EF_0_03[0] + ctxt.x18F560EF_0_03[3]);
+		if( (p[0]&0x04) != 0 )
+			arr.push(ctxt.x18F560EF_0_04[0] + ctxt.x18F560EF_0_04[2]);
+		else
+			arr.push(ctxt.x18F560EF_0_04[0] + ctxt.x18F560EF_0_04[1]);
+		if( (p[0]&0x20) != 0 )
+			arr.push(ctxt.x18F560EF_0_20[0] + ctxt.x18F560EF_0_20[2]);
+		else
+			arr.push(ctxt.x18F560EF_0_20[0] + ctxt.x18F560EF_0_20[1]);
+		arr.push(ctxt.x18F560EF_2_0 + ((p[2]&0xFF)+((p[3]<<8)&0xFF00)) + " rpm");
+	}
+	return arr.join(',');
+}
+
+function formatterFlock(o){
+	var flock = o.flock;
+	var arr = [];
+	if (flock.xf5 !== undefined) {
+		if ((flock.xf5 & 0x01) != 0)
+			arr.push(ctxt.flockst[0]);
+		else
+			arr.push(ctxt.flockst[1]);
+
+		if ((flock.xf5 & 0x02) != 0)
+			arr.push(ctxt.flockst[2]);
+		if ((flock.xf5 & 0x04) != 0)
+			arr.push(ctxt.flockst[3]);
+		if ((flock.xf5 & 0x08) != 0)
+			arr.push(ctxt.flockst[4]);
+		if ((flock.xf5 & 0x10) != 0)
+			arr.push(ctxt.flockst[5]);
+	}
+	if( flock.xf7 !== undefined && flock.xf7>0 && flock.xf7<ctxt.flockm.length){
+		arr.push(ctxt.flockm[flock.xf7]);
+	}
+	return arr.join(',');
+}
+
+//格式化扩展状态
+function formatterStatusEx(ex){
+	var str = new Array();
+	for(var i=0; i<ex.length; i++){
+		if( g_statusex[ex.charAt(i)] != undefined )
+			if( g_statusex[ex.charAt(i)].length > 0 )
+				str.push( g_statusex[ex.charAt(i)] );
+	}
+	return str.join(',');
+}
+//传入 LastPos对象
+function formatterStatusLock(p){
+	var str = '';
+	if( p.status.length >10 && g_status[10][parseInt(p.status.charAt(10))].length > 0 )
+		str+=( g_status[10][parseInt(p.status.charAt(10))] ) + ',';
+	
+	if( p.other != null && p.other.length>0){
+		var o = eval("("+p.other+")");
+		//开锁次数
+		if( o.opentimes !== undefined && o.opentimes >= 0 ){
+			str+=( ctxt.opentimes + o.opentimes );
+		}
+	}
+	return str;
+}
+
+/**
+ * 格式化 秒数 为 xx天xx时xx分xx秒
+ * @param l
+ */
+function formatterTime(l){
+	var day = parseInt(l / (60*60*24) )
+	var hour = parseInt(l / (60 * 60 ) - day*24);
+	var min = parseInt((l / (60 )) - day*24*60 - hour * 60);
+	var s = parseInt(l  - day*24*60*60 - hour * 60 * 60 - min * 60);
+	var time = "" + (day>0 ? day+ ctxt.day : '') + (hour>0 ? hour+ ctxt.hour : '') + (min>0 ? min+ ctxt.min : '') + (s>0 ? s+ ctxt.second : '') + '';
+	return time;
+}
+
+//格式化GSM信号
+function formatterGSM(v){
+	var str="";
+	var gsm = v / 31 * 100;
+	if(gsm == 0) 
+		//str = "<img src='images/s0/si00.png' title='CSQ："+v+"'>";
+		str="";
+	else if(gsm>0 && gsm<=20)
+		str = "<img src='images/s0/si01.png' title='CSQ："+v+"'>";
+	else if(gsm>20 && gsm<=40)
+		str = "<img src='images/s0/si02.png' title='CSQ："+v+"'>";
+	else if(gsm>40 && gsm<=60)
+		str = "<img src='images/s0/si03.png' title='CSQ："+v+"'>";
+	else if(gsm>60 && gsm<=80 )
+		str = "<img src='images/s0/si04.png' title='CSQ："+v+"'>";
+	else if(gsm>80  )
+		str = "<img src='images/s0/si05.png' title='CSQ："+v+"'>";
+	return str;
+}
+//格式化GPS信号
+function formatterGPS(gps){
+	var str="";
+	var gsm = gps / 10 * 100;
+	if(gsm <= 0) 
+		//str = "<img src='images/s1/si00.png' title='GPS："+gps+"'>";
+		str="";
+	else if(gsm>0 && gsm<=20)
+		str = "<img src='images/s1/si01.png' title='GPS："+gps+"'>";
+	else if(gsm>20 && gsm<=40)
+		str = "<img src='images/s1/si02.png' title='GPS："+gps+"'>";
+	else if(gsm>40 && gsm<=60)
+		str = "<img src='images/s1/si03.png' title='GPS："+gps+"'>";
+	else if(gsm>60 && gsm<=80 )
+		str = "<img src='images/s1/si04.png' title='GPS："+gps+"'>";
+	else if(gsm>80  )
+		str = "<img src='images/s1/si05.png' title='GPS："+gps+"'>";
+	return str;
+}
+//格式化电量
+function formatterPower(power){
+	var str="";
+	if(power <= 0) 
+		//str = "<img src='images/POWER0.gif' title='POWER："+power+"'>";
+		str="";
+	else if(power>0 && power<=25)
+		str = "<img src='images/POWER1.gif' title='POWER："+power+"'>";
+	else if(power>25 && power<=50)
+		str = "<img src='images/POWER2.gif' title='POWER："+power+"'>";
+	else if(power>50 && power<=75)
+		str = "<img src='images/POWER3.gif' title='POWER："+power+"'>";
+	else if(power>75 )
+		str = "<img src='images/POWER4.gif' title='POWER："+power+"'>";
+	return str;
+}
+
+
+//lnglats 为经度/纬度/经度/纬度......这样的double类型数组.
+function gcj02towgs84(lnglats, callback){
+	$.post('region/gcj02towgs84', {lnglats: lnglats.join(',')}, function(rs){
+		if(rs !== null && rs.success){
+			callback(rs.content);
+		}
+	}, 'json');
+}
+
+//格式化 报警类型
+function formatterAlarm(alarmcode){
+	return g_alarmString[alarmcode];
+}
+//格式化 报警为 开始/结束
+function formatterAlarmContinuing(i){
+	return g_alarmstate[i];
+}
+//格式化 日志类型
+function formatterLog(logcode){
+	return g_codelog[logcode];
+}
+//格式化 性别
+function formatterSex(val, row, idx){
+	if( val != null )
+		return ctxt.sex[val];
+	else
+		return '';
+}
+//格式化 方向角
+function formatterDirect(d){
+	if ( d <= 23 || d >337 ){
+		return ctxt.direct[0];
+	}
+	else if ( d>23 && d <= 68 ){
+		return ctxt.direct[1];
+	}
+	else if ( d>68 && d <= 113 ){
+		return ctxt.direct[2];
+	}
+	else if ( d>113 && d <= 158 ){
+		return ctxt.direct[3];
+	}
+	else if ( d>158 && d <= 203 ){
+		return ctxt.direct[4];
+	}
+	else if ( d>203 && d <= 248 ){
+		return ctxt.direct[5];
+	}
+	else if ( d>248 && d <= 293 ){
+		return ctxt.direct[6];
+	}
+	else if ( d>293 && d <= 338 ){
+		return ctxt.direct[7];
+	}
+	else
+	{
+		return ctxt.direct[8];
+	}
+}
+//格式化 地址 , s = status, d = result
+function formatterAddrGaode(s,d){
+	switch(s){
+	case 'error':
+		return d;
+		break;
+	case 'no_data':
+		return '';
+		break;
+	case 'complete':
+		{
+			var rg = d.regeocode;
+			if( rg == null ) return '';
+			var str = rg.formattedAddress;
+			if( rg.pois !=null ){
+				var a2 = rg.pois;
+				a2.sort(function(a,b){
+					return parseFloat(a.distance) - parseFloat(b.distance);
+				});
+				for(var i=0;i < rg.pois.length && i<2; i++ ){
+					var o = rg.pois[i];
+					str += '('+o.address+o.name+parseInt(o.distance)+'米附近)';
+				}
+			}
+			return str;
+		}
+		break;
+	}
+}
+
+
+
+
+
+
+function isoutofchina(lng, lat){
+	//taiwan
+	if(lng >119.829167 && lng<121.917462 && lat>21.527158 && lat<25.31698){
+		return true;
+	}
+	
+	if( lng>137.8347 || lng<72.004 || lat>55.8271 || lat<0.8293){
+		return true;
+	}
+	
+	return false;
+}
+
+
+
+function setCookie(name, value, hours) {
+    var d = new Date();
+    d.setTime(d.getTime() + hours * 3600 * 1000);
+    document.cookie = name + '=' + value + '; expires=' + d.toGMTString();
+}
+function getCookie(name) {
+    var arr = document.cookie.split('; ');
+    for (var i = 0; i < arr.length; i++) {
+        var temp = arr[i].split('=');
+        if (temp[0] == name) {
+            return temp[1];
+        }
+    }
+    return '';
+}
+
+function select2showdefautlvalue(ele, id, text){
+	if( id == null ) {
+		$(ele).val(null).trigger('change');
+		return;
+	}
+	var newOption = new Option(text, id, true, true);
+    $(ele).append(newOption).trigger('change');
+    $(ele).change();
+}
+
+// 排放标准 号牌颜色
+function formatterCcolor(c){
+	var color = {
+		green: "background-color: #00997a!important;",
+		blue: "background-color: #001f99!important;",
+		red: "background-color: #c63d00!important;",
+	} 
+	var style = "" 
+	if(c === "国一"){
+		style = color.red
+	} else if(c === "国二"){
+		style = color.blue
+	} else{
+		style = color.green
+	}
+	return style
+}

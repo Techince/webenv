@@ -1,0 +1,45 @@
+
+
+/*
+ * author: gimi.shi
+ * 扩展JQUERY支持获取图片实际大小
+ * */
+
+	(function($){
+	    var
+	    props = ['Width', 'Height'],
+	    prop;
+
+	    while (prop = props.pop()) {
+	    (function (natural, prop) {
+	      $.fn[natural] = (natural in new Image()) ? 
+	      function () {
+	      return this[0][natural];
+	      } : 
+	      function () {
+	      var 
+	      node = this[0],
+	      img,
+	      value;
+
+	      if (node.tagName.toLowerCase() === 'img') {
+	        img = new Image();
+	        img.src = node.src,
+	        value = img[prop];
+	      }
+	      return value;
+	      };
+	    }('natural' + prop, prop.toLowerCase()));
+	    }
+	  }(jQuery));
+	
+	
+function imageChangeSizeOnload(id, targetWidth){
+	$(id).load(function(){
+        var width = $(id).naturalWidth();
+        if( width > targetWidth )
+            $(id).attr('width', targetWidth).show();
+        else
+            $(id).attr('width', width).show();
+    });
+}

@@ -1,0 +1,20 @@
+
+//字典国际化处理
+
+var g_dictionarycon = JSON.parse(localStorage.getItem('g_dictionarycon')); //储存字典
+//请求字典内容
+/*转移到index*/
+
+//用id返回对应的内容
+function formattergetDict(val,row,index){
+	var str = val
+	if(g_dictionarycon){
+		g_dictionarycon.map(item=>{
+			if(item.id == val){
+				str = item.text
+			}
+		})		
+	}
+	return str;
+};
+
